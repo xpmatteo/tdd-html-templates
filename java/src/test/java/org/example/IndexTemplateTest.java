@@ -1,13 +1,13 @@
 package org.example;
 
 import com.samskivert.mustache.Mustache;
+import com.samskivert.mustache.Template;
 import org.jsoup.Jsoup;
 import org.jsoup.parser.Parser;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -15,9 +15,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class IndexTemplateTest {
     @Test
     void indexIsSoundHtml() {
-        Mustache.compiler().compile(
+        var template = Mustache.compiler().compile(
                 new InputStreamReader(
                         getClass().getResourceAsStream("/index.tmpl")));
+        var model = new TodoList();
+
+        var html = template.execute(model);
     }
 
     @Test
