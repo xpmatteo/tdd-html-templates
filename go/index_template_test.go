@@ -10,17 +10,14 @@ import (
 )
 
 func Test_wellFormedHtml(t *testing.T) {
-	templ := template.Must(template.ParseFiles("index.tmpl"))
 	model := todo.NewList()
 
-	// render the template into a buffer
-	var buf bytes.Buffer
-	err := templ.Execute(&buf, model)
-	if err != nil {
-		panic(err)
-	}
+	buf := renderTemplate("index.tmpl", model)
 
-	// check that the template can be parsed as (lenient) XML
+	assertWellFormedHtml(t, buf)
+}
+
+func assertWellFormedHtml(t *testing.T, buf bytes.Buffer) {
 	decoder := xml.NewDecoder(bytes.NewReader(buf.Bytes()))
 	decoder.Strict = false
 	decoder.AutoClose = xml.HTMLAutoClose
@@ -36,4 +33,14 @@ func Test_wellFormedHtml(t *testing.T) {
 			t.Fatalf("Error parsing html: %s", err)
 		}
 	}
+}
+
+func renderTemplate(templateName string, model any) bytes.Buffer {
+	templ := template.Must(template.ParseFiles(templateName))
+	var buf bytes.Buffer
+	err := templ.Execute(&buf, model)
+	if err != nil {
+		panic(err)
+	}
+	return buf
 }
