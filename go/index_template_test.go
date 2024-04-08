@@ -35,6 +35,19 @@ func Test_todoItemsAreShown(t *testing.T) {
 	assert.Equal(t, "Bar", text(selection.Nodes[1]))
 }
 
+func Test_completedItemsGetCompletedClass(t *testing.T) {
+	model := todo.NewList()
+	model.Add("Foo")
+	model.AddCompleted("Bar")
+
+	buf := renderTemplate("index.tmpl", model)
+
+	document := parseHtml(t, buf)
+	selection := document.Find("ul.todo-list li.completed")
+	assert.Equal(t, 1, selection.Size())
+	assert.Equal(t, "Bar", text(selection.Nodes[0]))
+}
+
 func parseHtml(t *testing.T, buf bytes.Buffer) *goquery.Document {
 	document, err := goquery.NewDocumentFromReader(bytes.NewReader(buf.Bytes()))
 	if err != nil {

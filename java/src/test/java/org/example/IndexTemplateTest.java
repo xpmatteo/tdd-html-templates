@@ -38,6 +38,20 @@ class IndexTemplateTest {
     }
 
     @Test
+    void completedItemsGetCompletedClass() {
+        var model = new TodoList();
+        model.add("Foo");
+        model.addCompleted("Bar");
+
+        var html = renderTemplate("/index.tmpl", model);
+
+        Document document = Jsoup.parse(html, "");
+        var selection = document.select("ul.todo-list li.completed");
+        assertThat(selection).hasSize(1);
+        assertThat(selection.text()).isEqualTo("Bar");
+    }
+
+    @Test
     void failOnBrokenHtml() {
         String htmlString = "<p>foo</div>";
 
