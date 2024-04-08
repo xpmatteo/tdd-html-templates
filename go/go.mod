@@ -1,4 +1,4 @@
-module demo-template-test
+module tdd-html-templates
 
 go 1.22.1
 
