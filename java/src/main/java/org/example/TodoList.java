@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TodoList {
@@ -14,4 +15,7 @@ public class TodoList {
         return this;
     }
 
+    public List<TodoItem> allItems() {
+        return Collections.unmodifiableList(items);
+    }
 }
