@@ -6,24 +6,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.parser.Parser;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class IndexTemplateTest {
     @Test
-    void indexIsSoundHtml() {
-        var model = new TodoList();
-
-        var html = renderTemplate("/index.tmpl", model);
-
-        assertSoundHtml(html);
-    }
-
-    @Test
-    void todoItemsAreShown() throws IOException {
+    void todoItemsAreShown() {
         var model = new TodoList();
         model.add("Foo");
         model.add("Bar");
@@ -52,17 +41,14 @@ class IndexTemplateTest {
     }
 
     private static Document parseHtml(String html) {
-        return Jsoup.parse(html, "");
-    }
-
-    // thanks https://stackoverflow.com/a/64465867/164802
-    private static void assertSoundHtml(String html) {
+        // thanks https://stackoverflow.com/a/64465867/164802
         var parser = Parser.htmlParser().setTrackErrors(10);
-        Jsoup.parse(html, "", parser);
+        var document = Jsoup.parse(html, "", parser);
         assertThat(parser.getErrors()).isEmpty();
+        return document;
     }
 
-    @SuppressWarnings("DataFlowIssue")
+    @SuppressWarnings({"DataFlowIssue", "SameParameterValue"})
     private String renderTemplate(String templateName, Object model) {
         var template = Mustache.compiler().compile(
                 new InputStreamReader(

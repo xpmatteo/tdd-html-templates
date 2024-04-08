@@ -49,6 +49,7 @@ func Test_completedItemsGetCompletedClass(t *testing.T) {
 }
 
 func parseHtml(t *testing.T, buf bytes.Buffer) *goquery.Document {
+	assertWellFormedHtml(t, buf)
 	document, err := goquery.NewDocumentFromReader(bytes.NewReader(buf.Bytes()))
 	if err != nil {
 		// if parsing fails, we stop the test here with t.FatalF
