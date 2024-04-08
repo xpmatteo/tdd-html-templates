@@ -4,44 +4,59 @@ import com.samskivert.mustache.Mustache;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.parser.Parser;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.InputStreamReader;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class IndexTemplateTest {
-    @Test
-    void todoItemsAreShown() {
-        var model = new TodoList();
-        model.add("Foo");
-        model.add("Bar");
-
-        var html = renderTemplate("/index.tmpl", model);
-
-        var document = parseHtml(html);
-        var selection = document.select("ul.todo-list li");
-        assertThat(selection).hasSize(2);
-        assertThat(selection.get(0).text()).isEqualTo("Foo");
-        assertThat(selection.get(1).text()).isEqualTo("Bar");
+    record IndexTestCase(String name,
+                         TodoList model,
+                         String selector,
+                         List<String> matches) {
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
-    @Test
-    void completedItemsGetCompletedClass() {
-        var model = new TodoList();
-        model.add("Foo");
-        model.addCompleted("Bar");
-
-        var html = renderTemplate("/index.tmpl", model);
-
-        var document = parseHtml(html);
-        var selection = document.select("ul.todo-list li.completed");
-        assertThat(selection).hasSize(1);
-        assertThat(selection.text()).isEqualTo("Bar");
+    public static IndexTestCase[] indexTestCases() {
+        return new IndexTestCase[]{
+                new IndexTestCase(
+                        "all todo items are shown",
+                        new TodoList()
+                                .add("Foo")
+                                .add("Bar"),
+                        "ul.todo-list li",
+                        List.of("Foo", "Bar")),
+                new IndexTestCase(
+                        "completed items get the 'completed' class",
+                        new TodoList()
+                                .add("Foo")
+                                .addCompleted("Bar"),
+                        "ul.todo-list li.completed",
+                        List.of("Bar")),
+        };
     }
 
+    @ParameterizedTest
+    @MethodSource("indexTestCases")
+    void testIndexTemplate(IndexTestCase test) {
+        var html = renderTemplate("/index.tmpl", test.model);
+
+        var document = parseHtml(html);
+        var selection = document.select(test.selector);
+        assertThat(selection).hasSize(test.matches.size());
+        for (int i = 0; i < test.matches.size(); i++) {
+            assertThat(selection.get(i).text()).isEqualTo(test.matches.get(i));
+        }
+    }
+
+    // thanks https://stackoverflow.com/a/64465867/164802
     private static Document parseHtml(String html) {
-        // thanks https://stackoverflow.com/a/64465867/164802
         var parser = Parser.htmlParser().setTrackErrors(10);
         var document = Jsoup.parse(html, "", parser);
         assertThat(parser.getErrors()).isEmpty();
