@@ -48,6 +48,25 @@ func Test_completedItemsGetCompletedClass(t *testing.T) {
 	assert.Equal(t, "Bar", text(selection.Nodes[0]))
 }
 
+func Test_html5AttributesAreOk(t *testing.T) {
+	htmlString := "<p hidden>foo</p>"
+
+	assertWellFormedHtml(t, *bytes.NewBufferString(htmlString))
+}
+
+func Test_unclosedParasAreOk(t *testing.T) {
+	htmlString := "<section><p>first<p>second</section>"
+
+	assertWellFormedHtml(t, *bytes.NewBufferString(htmlString))
+}
+
+// This SHOULD FAIL ... the parser we're using is not good enough
+func Test_unclosedDivsAreInvalid(t *testing.T) {
+	htmlString := "<section><form>first<div>second</section>"
+
+	assertWellFormedHtml(t, *bytes.NewBufferString(htmlString))
+}
+
 func parseHtml(t *testing.T, buf bytes.Buffer) *goquery.Document {
 	assertWellFormedHtml(t, buf)
 	document, err := goquery.NewDocumentFromReader(bytes.NewReader(buf.Bytes()))
