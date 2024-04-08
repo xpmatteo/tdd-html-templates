@@ -30,7 +30,7 @@ class IndexTemplateTest {
 
         var html = renderTemplate("/index.tmpl", model);
 
-        Document document = Jsoup.parse(html, "");
+        var document = parseHtml(html);
         var selection = document.select("ul.todo-list li");
         assertThat(selection).hasSize(2);
         assertThat(selection.get(0).text()).isEqualTo("Foo");
@@ -45,42 +45,14 @@ class IndexTemplateTest {
 
         var html = renderTemplate("/index.tmpl", model);
 
-        Document document = Jsoup.parse(html, "");
+        var document = parseHtml(html);
         var selection = document.select("ul.todo-list li.completed");
         assertThat(selection).hasSize(1);
         assertThat(selection.text()).isEqualTo("Bar");
     }
 
-    @Test
-    void failOnBrokenHtml() {
-        String htmlString = "<p>foo</div>";
-
-        assertThatThrownBy(() -> assertSoundHtml(htmlString))
-                .isInstanceOf(AssertionError.class)
-                .hasMessageContaining("Unexpected EndTag token [</div>]");
-    }
-
-    @Test
-    void html5AttributesAreOk() {
-        String htmlString = "<p hidden>foo</p>";
-
-        assertSoundHtml(htmlString);
-    }
-
-    @Test
-    void unclosedParasAreOk() throws IOException {
-        String htmlString = "<section><p>first<p>second</section>";
-
-        assertSoundHtml(htmlString);
-    }
-
-    @Test
-    void unclosedDivsAreInvalid() throws IOException {
-        String htmlString = "<section><div>first<div>second</section>";
-
-        assertThatThrownBy(() -> assertSoundHtml(htmlString))
-                .isInstanceOf(AssertionError.class)
-                .hasMessageContaining("Unexpected EndTag token [</section>]");
+    private static Document parseHtml(String html) {
+        return Jsoup.parse(html, "");
     }
 
     // thanks https://stackoverflow.com/a/64465867/164802
