@@ -21,6 +21,11 @@ class IndexTemplateTest {
         var model = new TodoList();
 
         var html = template.execute(model);
+
+        var parser = Parser.htmlParser()
+                .setTrackErrors(10);
+        Jsoup.parse(html, "", parser);
+        assertThat(parser.getErrors()).isEmpty();
     }
 
     @Test
