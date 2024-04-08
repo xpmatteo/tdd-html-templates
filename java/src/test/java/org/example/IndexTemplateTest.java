@@ -1,20 +1,30 @@
 package org.example;
 
+import com.samskivert.mustache.Mustache;
 import org.jsoup.Jsoup;
 import org.jsoup.parser.Parser;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class HtmlTest {
+class IndexTemplateTest {
+    @Test
+    void indexIsSoundHtml() {
+        Mustache.compiler().compile(
+                new InputStreamReader(
+                        getClass().getResourceAsStream("/index.tmpl")));
+    }
+
     @Test
     void failOnBrokenHtml() throws IOException {
         String htmlString = "<p>foo</div>";
 
-        assertThatThrownBy( () -> assertWellFormedHtml(htmlString) )
+        assertThatThrownBy(() -> assertWellFormedHtml(htmlString))
                 .isInstanceOf(AssertionError.class)
                 .hasMessageContaining("Unexpected EndTag token [</div>]");
     }
@@ -37,7 +47,7 @@ class HtmlTest {
     void unclosedDivsAreInvalid() throws IOException {
         String htmlString = "<section><div>first<div>second</section>";
 
-        assertThatThrownBy( () -> assertWellFormedHtml(htmlString) )
+        assertThatThrownBy(() -> assertWellFormedHtml(htmlString))
                 .isInstanceOf(AssertionError.class)
                 .hasMessageContaining("Unexpected EndTag token [</section>]");
     }
