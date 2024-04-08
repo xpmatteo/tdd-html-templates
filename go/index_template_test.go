@@ -28,22 +28,20 @@ func Test_todoItemsAreShown(t *testing.T) {
 
 	buf := renderTemplate("index.tmpl", model)
 
-	// parse the HTML with goquery
+	document := parseHtml(t, buf)
+	selection := document.Find("ul.todo-list li")
+	assert.Equal(t, 2, selection.Length())
+	assert.Equal(t, "Foo", text(selection.Nodes[0]))
+	assert.Equal(t, "Bar", text(selection.Nodes[1]))
+}
+
+func parseHtml(t *testing.T, buf bytes.Buffer) *goquery.Document {
 	document, err := goquery.NewDocumentFromReader(bytes.NewReader(buf.Bytes()))
 	if err != nil {
 		// if parsing fails, we stop the test here with t.FatalF
 		t.Fatalf("Error rendering template %s", err)
 	}
-
-	// assert there are two <li> elements inside the <ul class="todo-list">
-	selection := document.Find("ul.todo-list li")
-	assert.Equal(t, 2, selection.Length())
-
-	// assert the first <li> text is "Foo"
-	assert.Equal(t, "Foo", text(selection.Nodes[0]))
-
-	// assert the second <li> text is "Bar"
-	assert.Equal(t, "Bar", text(selection.Nodes[1]))
+	return document
 }
 
 func text(node *html.Node) string {

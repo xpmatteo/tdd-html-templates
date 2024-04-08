@@ -30,17 +30,10 @@ class IndexTemplateTest {
 
         var html = renderTemplate("/index.tmpl", model);
 
-        // parse the HTML with jsoup
         Document document = Jsoup.parse(html, "");
-
-        // assert there are two <li> elements inside the <ul class="todo-list">
         var selection = document.select("ul.todo-list li");
         assertThat(selection).hasSize(2);
-
-        // assert the first <li> text is "Foo"
         assertThat(selection.get(0).text()).isEqualTo("Foo");
-
-        // assert the second <li> text is "Bar"
         assertThat(selection.get(1).text()).isEqualTo("Bar");
     }
 
