@@ -39,6 +39,14 @@ class IndexTemplateTest {
                                 .addCompleted("Bar"),
                         "ul.todo-list li.completed",
                         List.of("Bar")),
+                new TestCase(
+                        "items left",
+                        new TodoList()
+                                .add("One")
+                                .add("Two")
+                                .addCompleted("Three"),
+                        "span.todo-count",
+                        List.of("2 items left")),
         };
     }
 
