@@ -9,12 +9,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class IndexTemplateTest {
     record TestCase(String name,
                     TodoList model,
+                    String path,
                     String selector,
                     List<String> matches) {
         @Override
@@ -30,6 +32,7 @@ class IndexTemplateTest {
                         new TodoList()
                                 .add("Foo")
                                 .add("Bar"),
+                        "/",
                         "ul.todo-list li",
                         List.of("Foo", "Bar")),
                 new TestCase(
@@ -37,6 +40,7 @@ class IndexTemplateTest {
                         new TodoList()
                                 .add("Foo")
                                 .addCompleted("Bar"),
+                        "/",
                         "ul.todo-list li.completed",
                         List.of("Bar")),
                 new TestCase(
@@ -45,15 +49,34 @@ class IndexTemplateTest {
                                 .add("One")
                                 .add("Two")
                                 .addCompleted("Three"),
+                        "/",
                         "span.todo-count",
                         List.of("2 items left")),
+                new TestCase(
+                        "highlighted navigation link: All",
+                        new TodoList(),
+                        "/",
+                        "ul.filters a.selected",
+                        List.of("All")),
+                new TestCase(
+                        "highlighted navigation link: Active",
+                        new TodoList(),
+                        "/active",
+                        "ul.filters a.selected",
+                        List.of("Active")),
+                new TestCase(
+                        "highlighted navigation link: Completed",
+                        new TodoList(),
+                        "/completed",
+                        "ul.filters a.selected",
+                        List.of("Completed")),
         };
     }
 
     @ParameterizedTest
     @MethodSource("indexTestCases")
     void testIndexTemplate(TestCase test) {
-        var html = renderTemplate("/index.tmpl", test.model);
+        var html = renderTemplate("/index.tmpl", test.model, test.path);
 
         var document = parseHtml(html);
         var selection = document.select(test.selector);
@@ -72,10 +95,14 @@ class IndexTemplateTest {
     }
 
     @SuppressWarnings({"DataFlowIssue", "SameParameterValue"})
-    private String renderTemplate(String templateName, Object model) {
+    private String renderTemplate(String templateName, Object model, String path) {
         var template = Mustache.compiler().compile(
                 new InputStreamReader(
                         getClass().getResourceAsStream(templateName)));
-        return template.execute(model);
+        var data = Map.of(
+                "model", model,
+                "path", path
+        );
+        return template.execute(data);
     }
 }
