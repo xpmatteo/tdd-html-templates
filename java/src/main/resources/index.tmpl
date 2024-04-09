@@ -20,7 +20,7 @@
 				<input id="toggle-all" class="toggle-all" type="checkbox">
 				<label for="toggle-all">Mark all as complete</label>
 				<ul class="todo-list">
-					{{ #allItems }}
+					{{ #model.allItems }}
 					<li class="{{ #isCompleted }}completed{{ /isCompleted }}">
 						<div class="view">
 							<input class="toggle" type="checkbox">
@@ -28,13 +28,13 @@
 							<button class="destroy"></button>
 						</div>
 					</li>
-					{{ /allItems }}
+					{{ /model.allItems }}
 				</ul>
 			</section>
 			<!-- This footer should be hidden by default and shown when there are todos -->
 			<footer class="footer">
 				<!-- This should be `0 items left` by default -->
-				<span class="todo-count"><strong>{{activeItemsCount}}</strong> items left</span>
+				<span class="todo-count"><strong>{{model.activeItemsCount}}</strong> items left</span>
 				<!-- Remove this if you don't implement routing -->
 				<ul class="filters">
 					<li>

@@ -10,13 +10,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class IndexTemplateTest {
     record TestCase(String name,
                     TodoList model,
-                    String url,
+                    String path,
                     String selector,
                     List<String> matches) {
         @Override
@@ -27,7 +28,7 @@ class IndexTemplateTest {
         public static final class Builder {
             String name;
             TodoList model;
-            String url;
+            String path = "/";
             String selector;
             List<String> matches;
 
@@ -41,8 +42,8 @@ class IndexTemplateTest {
                 return this;
             }
 
-            public Builder url(String url) {
-                this.url = url;
+            public Builder path(String path) {
+                this.path = path;
                 return this;
             }
 
@@ -57,7 +58,7 @@ class IndexTemplateTest {
             }
 
             public TestCase build() {
-                return new TestCase(name, model, url, selector, matches);
+                return new TestCase(name, model, path, selector, matches);
             }
         }
     }
@@ -91,9 +92,9 @@ class IndexTemplateTest {
 
     @ParameterizedTest
     @MethodSource("indexTestCases")
-    void testIndexTemplate(TestCase.Builder testBulder) {
-        var test = testBulder.build();
-        var html = renderTemplate("/index.tmpl", test.model);
+    void testIndexTemplate(TestCase.Builder testBuilder) {
+        var test = testBuilder.build();
+        var html = renderTemplate("/index.tmpl", test.model, test.path);
 
         var document = parseHtml(html);
         var selection = document.select(test.selector);
@@ -112,10 +113,14 @@ class IndexTemplateTest {
     }
 
     @SuppressWarnings({"DataFlowIssue", "SameParameterValue"})
-    private String renderTemplate(String templateName, Object model) {
+    private String renderTemplate(String templateName, TodoList model, String path) {
         var template = Mustache.compiler().compile(
                 new InputStreamReader(
                         getClass().getResourceAsStream(templateName)));
-        return template.execute(model);
+        var data = Map.of(
+                "model", model,
+                "path", path
+        );
+        return template.execute(data);
     }
 }
