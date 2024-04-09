@@ -38,13 +38,13 @@
 				<!-- Remove this if you don't implement routing -->
 				<ul class="filters">
 					<li>
-						<a class="selected" href="#/">All</a>
+						<a class="{{ if eq .path "/" }}selected{{ end }}" href="#/">All</a>
 					</li>
 					<li>
-						<a href="#/active">Active</a>
+						<a class="{{ if eq .path "/active" }}selected{{ end }}" href="#/active">Active</a>
 					</li>
 					<li>
-						<a href="#/completed">Completed</a>
+						<a class="{{ if eq .path "/completed" }}selected{{ end }}" href="#/completed">Completed</a>
 					</li>
 				</ul>
 				<!-- Hidden if no completed items are left ↓ -->

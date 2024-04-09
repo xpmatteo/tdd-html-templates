@@ -134,7 +134,9 @@ class IndexTemplateTest {
                         getClass().getResourceAsStream(templateName)));
         var data = Map.of(
                 "model", model,
-                "path", path
+                "pathRoot", path.equals("/"),
+                "pathActive", path.equals("/active"),
+                "pathCompleted", path.equals("/completed")
         );
         return template.execute(data);
     }
