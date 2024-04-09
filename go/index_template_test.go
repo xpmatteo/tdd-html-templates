@@ -39,7 +39,7 @@ var testCases = []struct {
 	},
 }
 
-func Test_allDynamicFeatures(t *testing.T) {
+func Test_indexTemplate(t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 			if test.model == nil {
