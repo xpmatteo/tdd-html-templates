@@ -37,6 +37,15 @@ var testCases = []struct {
 		selector: "ul.todo-list li.completed",
 		matches:  []string{"Bar"},
 	},
+	{
+		name: "items left",
+		model: todo.NewList().
+			Add("One").
+			Add("Two").
+			AddCompleted("Three"),
+		selector: "span.todo-count",
+		matches:  []string{"2 items left"},
+	},
 }
 
 func Test_indexTemplate(t *testing.T) {
