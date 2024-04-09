@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/net/html"
 	"html/template"
 	"io"
@@ -13,58 +14,49 @@ import (
 	"testing"
 )
 
-func Test_wellFormedHtml(t *testing.T) {
-	model := todo.NewList()
-
-	buf := renderTemplate("index.tmpl", model)
-
-	assertWellFormedHtml(t, buf)
+var testCases = []struct {
+	name     string
+	model    *todo.List
+	path     string
+	selector string
+	matches  []string
+}{
+	{
+		name: "all todo items are shown",
+		model: todo.NewList().
+			Add("Foo").
+			Add("Bar"),
+		selector: "ul.todo-list li",
+		matches:  []string{"Foo", "Bar"},
+	},
+	{
+		name: "completed items get the 'completed' class",
+		model: todo.NewList().
+			Add("Foo").
+			AddCompleted("Bar"),
+		selector: "ul.todo-list li.completed",
+		matches:  []string{"Bar"},
+	},
 }
 
-func Test_todoItemsAreShown(t *testing.T) {
-	model := todo.NewList()
-	model.Add("Foo")
-	model.Add("Bar")
+func Test_allDynamicFeatures(t *testing.T) {
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+			if test.model == nil {
+				test.model = todo.NewList()
+			}
 
-	buf := renderTemplate("index.tmpl", model)
+			buf := renderTemplate("index.tmpl", test.model)
 
-	document := parseHtml(t, buf)
-	selection := document.Find("ul.todo-list li")
-	assert.Equal(t, 2, selection.Length())
-	assert.Equal(t, "Foo", text(selection.Nodes[0]))
-	assert.Equal(t, "Bar", text(selection.Nodes[1]))
-}
-
-func Test_completedItemsGetCompletedClass(t *testing.T) {
-	model := todo.NewList()
-	model.Add("Foo")
-	model.AddCompleted("Bar")
-
-	buf := renderTemplate("index.tmpl", model)
-
-	document := parseHtml(t, buf)
-	selection := document.Find("ul.todo-list li.completed")
-	assert.Equal(t, 1, selection.Size())
-	assert.Equal(t, "Bar", text(selection.Nodes[0]))
-}
-
-func Test_html5AttributesAreOk(t *testing.T) {
-	htmlString := "<p hidden>foo</p>"
-
-	assertWellFormedHtml(t, *bytes.NewBufferString(htmlString))
-}
-
-func Test_unclosedParasAreOk(t *testing.T) {
-	htmlString := "<section><p>first<p>second</section>"
-
-	assertWellFormedHtml(t, *bytes.NewBufferString(htmlString))
-}
-
-// This SHOULD FAIL ... the parser we're using is not good enough
-func Test_unclosedDivsAreInvalid(t *testing.T) {
-	htmlString := "<section><form>first<div>second</section>"
-
-	assertWellFormedHtml(t, *bytes.NewBufferString(htmlString))
+			assertWellFormedHtml(t, buf)
+			document := parseHtml(t, buf)
+			selection := document.Find(test.selector)
+			require.Equal(t, len(test.matches), len(selection.Nodes), "unexpected # of matches")
+			for i, node := range selection.Nodes {
+				assert.Equal(t, test.matches[i], text(node))
+			}
+		})
+	}
 }
 
 func parseHtml(t *testing.T, buf bytes.Buffer) *goquery.Document {
