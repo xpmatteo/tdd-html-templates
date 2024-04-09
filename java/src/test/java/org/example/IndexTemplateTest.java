@@ -63,24 +63,22 @@ class IndexTemplateTest {
         }
     }
 
-    public static TestCase[] indexTestCases() {
-        return new TestCase[]{
+    public static TestCase.Builder[] indexTestCases() {
+        return new TestCase.Builder[]{
                 new TestCase.Builder()
                         .name("all todo items are shown")
                         .model(new TodoList()
                                 .add("Foo")
                                 .add("Bar"))
                         .selector("ul.todo-list li")
-                        .matches("Foo", "Bar")
-                        .build(),
+                        .matches("Foo", "Bar"),
                 new TestCase.Builder()
                         .name("completed items get the 'completed' class")
                         .model(new TodoList()
                                 .add("Foo")
                                 .addCompleted("Bar"))
                         .selector("ul.todo-list li.completed")
-                        .matches("Bar")
-                        .build(),
+                        .matches("Bar"),
                 new TestCase.Builder()
                         .name("items left")
                         .model(new TodoList()
@@ -88,32 +86,29 @@ class IndexTemplateTest {
                                 .add("Two")
                                 .addCompleted("Three"))
                         .selector("span.todo-count")
-                        .matches("2 items left")
-                        .build(),
+                        .matches("2 items left"),
                 new TestCase.Builder()
                         .name("highlighted navigation link: All")
                         .path("/")
                         .selector("ul.filters a.selected")
-                        .matches("All")
-                        .build(),
+                        .matches("All"),
                 new TestCase.Builder()
                         .name("highlighted navigation link: Active")
                         .path("/active")
                         .selector("ul.filters a.selected")
-                        .matches("Active")
-                        .build(),
+                        .matches("Active"),
                 new TestCase.Builder()
                         .name("highlighted navigation link: Completed")
                         .path("/completed")
                         .selector("ul.filters a.selected")
-                        .matches("Completed")
-                        .build(),
+                        .matches("Completed"),
         };
     }
 
     @ParameterizedTest
     @MethodSource("indexTestCases")
-    void testIndexTemplate(TestCase test) {
+    void testIndexTemplate(TestCase.Builder testBuilder) {
+        var test = testBuilder.build();
         var html = renderTemplate("/index.tmpl", test.model, test.path);
 
         var document = parseHtml(html);
