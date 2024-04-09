@@ -13,26 +13,26 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class IndexTemplateTest {
-    record IndexTestCase(String name,
-                         TodoList model,
-                         String selector,
-                         List<String> matches) {
+    record TestCase(String name,
+                    TodoList model,
+                    String selector,
+                    List<String> matches) {
         @Override
         public String toString() {
             return name;
         }
     }
 
-    public static IndexTestCase[] indexTestCases() {
-        return new IndexTestCase[]{
-                new IndexTestCase(
+    public static TestCase[] indexTestCases() {
+        return new TestCase[]{
+                new TestCase(
                         "all todo items are shown",
                         new TodoList()
                                 .add("Foo")
                                 .add("Bar"),
                         "ul.todo-list li",
                         List.of("Foo", "Bar")),
-                new IndexTestCase(
+                new TestCase(
                         "completed items get the 'completed' class",
                         new TodoList()
                                 .add("Foo")
@@ -44,7 +44,7 @@ class IndexTemplateTest {
 
     @ParameterizedTest
     @MethodSource("indexTestCases")
-    void testIndexTemplate(IndexTestCase test) {
+    void testIndexTemplate(TestCase test) {
         var html = renderTemplate("/index.tmpl", test.model);
 
         var document = parseHtml(html);
