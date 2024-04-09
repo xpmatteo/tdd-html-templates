@@ -42,10 +42,6 @@ var testCases = []struct {
 func Test_indexTemplate(t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
-			if test.model == nil {
-				test.model = todo.NewList()
-			}
-
 			buf := renderTemplate("index.tmpl", test.model)
 
 			assertWellFormedHtml(t, buf)
