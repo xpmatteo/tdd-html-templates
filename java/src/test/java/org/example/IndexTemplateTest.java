@@ -8,6 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -51,8 +52,8 @@ class IndexTemplateTest {
                 return this;
             }
 
-            public Builder matches(List<String> matches) {
-                this.matches = matches;
+            public Builder matches(String ... matches) {
+                this.matches = Arrays.asList(matches);
                 return this;
             }
 
@@ -70,7 +71,7 @@ class IndexTemplateTest {
                                 .add("Foo")
                                 .add("Bar"))
                         .selector("ul.todo-list li")
-                        .matches(List.of("Foo", "Bar"))
+                        .matches("Foo", "Bar")
                         .build(),
                 new TestCase.Builder()
                         .name("completed items get the 'completed' class")
@@ -78,7 +79,7 @@ class IndexTemplateTest {
                                 .add("Foo")
                                 .addCompleted("Bar"))
                         .selector("ul.todo-list li.completed")
-                        .matches(List.of("Bar"))
+                        .matches("Bar")
                         .build(),
                 new TestCase.Builder()
                         .name("items left")
@@ -87,25 +88,25 @@ class IndexTemplateTest {
                                 .add("Two")
                                 .addCompleted("Three"))
                         .selector("span.todo-count")
-                        .matches(List.of("2 items left"))
+                        .matches("2 items left")
                         .build(),
                 new TestCase.Builder()
                         .name("highlighted navigation link: All")
                         .path("/")
                         .selector("ul.filters a.selected")
-                        .matches(List.of("All"))
+                        .matches("All")
                         .build(),
                 new TestCase.Builder()
                         .name("highlighted navigation link: Active")
                         .path("/active")
                         .selector("ul.filters a.selected")
-                        .matches(List.of("Active"))
+                        .matches("Active")
                         .build(),
                 new TestCase.Builder()
                         .name("highlighted navigation link: Completed")
                         .path("/completed")
                         .selector("ul.filters a.selected")
-                        .matches(List.of("Completed"))
+                        .matches("Completed")
                         .build(),
         };
     }
