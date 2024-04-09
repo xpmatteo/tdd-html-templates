@@ -51,7 +51,7 @@ var testCases = []struct {
 func Test_indexTemplate(t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
-			buf := renderTemplate("index.tmpl", test.model)
+			buf := renderTemplate("index.tmpl", test.model, test.path)
 
 			assertWellFormedHtml(t, buf)
 			document := parseHtml(t, buf)
@@ -99,10 +99,14 @@ func assertWellFormedHtml(t *testing.T, buf bytes.Buffer) {
 	}
 }
 
-func renderTemplate(templateName string, model any) bytes.Buffer {
+func renderTemplate(templateName string, model *todo.List, path string) bytes.Buffer {
 	templ := template.Must(template.ParseFiles(templateName))
 	var buf bytes.Buffer
-	err := templ.Execute(&buf, model)
+	data := map[string]any{
+		"model": model,
+		"path":  path,
+	}
+	err := templ.Execute(&buf, data)
 	if err != nil {
 		panic(err)
 	}
