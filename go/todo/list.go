@@ -29,34 +29,28 @@ func (l *List) AddCompleted(title string) *List {
 
 func (l *List) AllItems() []*Item {
 	var result []*Item
-	l.forEach(func(item *Item) {
+	for _, item := range l.Items {
 		result = append(result, item)
-	})
+	}
 	return result
 }
 
 func (l *List) CompletedItems() []*Item {
 	var result []*Item
-	l.forEach(func(item *Item) {
+	for _, item := range l.Items {
 		if item.IsCompleted {
 			result = append(result, item)
 		}
-	})
+	}
 	return result
 }
 
 func (l *List) ActiveItems() []*Item {
 	var result []*Item
-	l.forEach(func(item *Item) {
+	for _, item := range l.Items {
 		if !item.IsCompleted {
 			result = append(result, item)
 		}
-	})
-	return result
-}
-
-func (l *List) forEach(f func(*Item)) {
-	for _, item := range l.Items {
-		f(item)
 	}
+	return result
 }

@@ -9,4 +9,8 @@ public record TodoItem(String title, boolean isCompleted) {
     public static TodoItem completed(String title) {
         return new TodoItem(title, true);
     }
+
+    public boolean isActive() {
+        return !isCompleted;
+    }
 }

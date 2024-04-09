@@ -10,6 +10,7 @@ public class TodoList {
         items.add(TodoItem.active(title));
         return this;
     }
+
     public TodoList addCompleted(String title) {
         items.add(TodoItem.completed(title));
         return this;
@@ -17,5 +18,9 @@ public class TodoList {
 
     public List<TodoItem> allItems() {
         return Collections.unmodifiableList(items);
+    }
+
+    public long activeItemsCount() {
+        return items.stream().filter(TodoItem::isActive).count();
     }
 }
