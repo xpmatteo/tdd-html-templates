@@ -8,7 +8,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -52,8 +51,8 @@ class IndexTemplateTest {
                 return this;
             }
 
-            public Builder matches(String ... matches) {
-                this.matches = Arrays.asList(matches);
+            public Builder matches(List<String> matches) {
+                this.matches = matches;
                 return this;
             }
 
@@ -63,22 +62,24 @@ class IndexTemplateTest {
         }
     }
 
-    public static TestCase.Builder[] indexTestCases() {
-        return new TestCase.Builder[]{
+    public static TestCase[] indexTestCases() {
+        return new TestCase[]{
                 new TestCase.Builder()
                         .name("all todo items are shown")
                         .model(new TodoList()
                                 .add("Foo")
                                 .add("Bar"))
                         .selector("ul.todo-list li")
-                        .matches("Foo", "Bar"),
+                        .matches(List.of("Foo", "Bar"))
+                        .build(),
                 new TestCase.Builder()
                         .name("completed items get the 'completed' class")
                         .model(new TodoList()
                                 .add("Foo")
                                 .addCompleted("Bar"))
                         .selector("ul.todo-list li.completed")
-                        .matches("Bar"),
+                        .matches(List.of("Bar"))
+                        .build(),
                 new TestCase.Builder()
                         .name("items left")
                         .model(new TodoList()
@@ -86,14 +87,32 @@ class IndexTemplateTest {
                                 .add("Two")
                                 .addCompleted("Three"))
                         .selector("span.todo-count")
-                        .matches("2 items left"),
+                        .matches(List.of("2 items left"))
+                        .build(),
+                new TestCase.Builder()
+                        .name("highlighted navigation link: All")
+                        .path("/")
+                        .selector("ul.filters a.selected")
+                        .matches(List.of("All"))
+                        .build(),
+                new TestCase.Builder()
+                        .name("highlighted navigation link: Active")
+                        .path("/active")
+                        .selector("ul.filters a.selected")
+                        .matches(List.of("Active"))
+                        .build(),
+                new TestCase.Builder()
+                        .name("highlighted navigation link: Completed")
+                        .path("/completed")
+                        .selector("ul.filters a.selected")
+                        .matches(List.of("Completed"))
+                        .build(),
         };
     }
 
     @ParameterizedTest
     @MethodSource("indexTestCases")
-    void testIndexTemplate(TestCase.Builder testBuilder) {
-        var test = testBuilder.build();
+    void testIndexTemplate(TestCase test) {
         var html = renderTemplate("/index.tmpl", test.model, test.path);
 
         var document = parseHtml(html);
