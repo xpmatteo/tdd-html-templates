@@ -27,8 +27,8 @@ class IndexTemplateTest {
 
         public static final class Builder {
             String name;
-            TodoList model;
-            String path;
+            TodoList model = new TodoList();
+            String path = "/";
             String selector;
             List<String> matches;
 

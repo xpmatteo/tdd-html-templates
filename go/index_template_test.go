@@ -46,11 +46,32 @@ var testCases = []struct {
 		selector: "span.todo-count",
 		matches:  []string{"2 items left"},
 	},
+	{
+		name:     "highlighted navigation link: All",
+		path:     "/",
+		selector: "ul.filters a.selected",
+		matches:  []string{"All"},
+	},
+	{
+		name:     "highlighted navigation link: Active",
+		path:     "/active",
+		selector: "ul.filters a.selected",
+		matches:  []string{"Active"},
+	},
+	{
+		name:     "highlighted navigation link: Completed",
+		path:     "/completed",
+		selector: "ul.filters a.selected",
+		matches:  []string{"Completed"},
+	},
 }
 
 func Test_indexTemplate(t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
+			if test.model == nil {
+				test.model = todo.NewList()
+			}
 			buf := renderTemplate("index.tmpl", test.model, test.path)
 
 			assertWellFormedHtml(t, buf)
