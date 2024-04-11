@@ -20,12 +20,8 @@ class IndexTemplateTest {
                     String path,
                     String selector,
                     List<String> matches) {
-        @Override
-        public String toString() {
-            return name;
-        }
 
-        public static final class Builder {
+        static final class Builder {
             String name;
             TodoList model = new TodoList();
             String path = "/";
@@ -59,6 +55,11 @@ class IndexTemplateTest {
 
             public TestCase build() {
                 return new TestCase(name, model, path, selector, matches);
+            }
+
+            @Override
+            public String toString() {
+                return name;
             }
         }
     }
