@@ -5,6 +5,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.junit.jupiter.api.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.example.Render.parseHtml;
 import static org.example.Render.renderTemplate;
@@ -86,6 +90,11 @@ public class IndexBehaviourTest {
                 route.fulfill(new Route.FulfillOptions()
                         .setContentType("text/html")
                         .setBody(activeHtml));
+            } else if (route.request().url().startsWith("https://unpkg.com/htmx.org")) {
+                // return the htmx library from filesystem
+                route.fulfill(new Route.FulfillOptions()
+                        .setContentType("application/javascript")
+                        .setBody(readFile("src/test/resources/htmx.min.js")));
             } else {
                 // we don't want unexpected calls
                 fail(String.format("Unexpected request: %s %s", route.request().method(), route.request().url()));

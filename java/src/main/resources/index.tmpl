@@ -4,6 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Template • TodoMVC</title>
+		<script src="https://unpkg.com/htmx.org@1.9.12"></script>
 	</head>
 	<body>
 		<section class="todoapp">
@@ -37,7 +38,11 @@
 						<a class="{{ #pathRoot }}selected{{ /pathRoot }}" href="#/">All</a>
 					</li>
 					<li>
-						<a class="{{ #pathActive }}selected{{ /pathActive }}" href="/active">Active</a>
+						<a
+						data-hx-get="/active"
+						data-hx-target="section.main"
+						data-hx-select="section.main"
+						class="{{ #pathActive }}selected{{ /pathActive }}" href="/active">Active</a>
 					</li>
 					<li>
 						<a class="{{ #pathCompleted }}selected{{ /pathCompleted }}" href="#/completed">Completed</a>
