@@ -20,8 +20,12 @@ class IndexTemplateTest {
                     String path,
                     String selector,
                     List<String> matches) {
+        @Override
+        public String toString() {
+            return name;
+        }
 
-        static final class Builder {
+        public static final class Builder {
             String name;
             TodoList model = new TodoList();
             String path = "/";
@@ -56,30 +60,27 @@ class IndexTemplateTest {
             public TestCase build() {
                 return new TestCase(name, model, path, selector, matches);
             }
-
-            @Override
-            public String toString() {
-                return name;
-            }
         }
     }
 
-    public static TestCase.Builder[] indexTestCases() {
-        return new TestCase.Builder[]{
+    public static TestCase[] indexTestCases() {
+        return new TestCase[]{
                 new TestCase.Builder()
                         .name("all todo items are shown")
                         .model(new TodoList()
                                 .add("Foo")
                                 .add("Bar"))
                         .selector("ul.todo-list li")
-                        .matches("Foo", "Bar"),
+                        .matches("Foo", "Bar")
+                        .build(),
                 new TestCase.Builder()
                         .name("completed items get the 'completed' class")
                         .model(new TodoList()
                                 .add("Foo")
                                 .addCompleted("Bar"))
                         .selector("ul.todo-list li.completed")
-                        .matches("Bar"),
+                        .matches("Bar")
+                        .build(),
                 new TestCase.Builder()
                         .name("items left")
                         .model(new TodoList()
@@ -87,29 +88,32 @@ class IndexTemplateTest {
                                 .add("Two")
                                 .addCompleted("Three"))
                         .selector("span.todo-count")
-                        .matches("2 items left"),
+                        .matches("2 items left")
+                        .build(),
                 new TestCase.Builder()
                         .name("highlighted navigation link: All")
                         .path("/")
                         .selector("ul.filters a.selected")
-                        .matches("All"),
+                        .matches("All")
+                        .build(),
                 new TestCase.Builder()
                         .name("highlighted navigation link: Active")
                         .path("/active")
                         .selector("ul.filters a.selected")
-                        .matches("Active"),
+                        .matches("Active")
+                        .build(),
                 new TestCase.Builder()
                         .name("highlighted navigation link: Completed")
                         .path("/completed")
                         .selector("ul.filters a.selected")
-                        .matches("Completed"),
+                        .matches("Completed")
+                        .build(),
         };
     }
 
     @ParameterizedTest
     @MethodSource("indexTestCases")
-    void testIndexTemplate(TestCase.Builder testBuilder) {
-        var test = testBuilder.build();
+    void testIndexTemplate(TestCase test) {
         var html = renderTemplate("/index.tmpl", test.model, test.path);
 
         var document = parseHtml(html);
