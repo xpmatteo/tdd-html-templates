@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.example.Render.parseHtml;
+import static org.example.Render.renderTemplate;
 
 class IndexTemplateTest {
     record TestCase(String name,
@@ -124,25 +126,4 @@ class IndexTemplateTest {
         }
     }
 
-    // thanks https://stackoverflow.com/a/64465867/164802
-    private static Document parseHtml(String html) {
-        var parser = Parser.htmlParser().setTrackErrors(10);
-        var document = Jsoup.parse(html, "", parser);
-        assertThat(parser.getErrors()).isEmpty();
-        return document;
-    }
-
-    @SuppressWarnings({"DataFlowIssue", "SameParameterValue"})
-    private String renderTemplate(String templateName, TodoList model, String path) {
-        var template = Mustache.compiler().compile(
-                new InputStreamReader(
-                        getClass().getResourceAsStream(templateName)));
-        var data = Map.of(
-                "model", model,
-                "pathRoot", path.equals("/"),
-                "pathActive", path.equals("/active"),
-                "pathCompleted", path.equals("/completed")
-        );
-        return template.execute(data);
-    }
 }
