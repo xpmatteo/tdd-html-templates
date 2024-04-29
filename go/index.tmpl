@@ -38,7 +38,11 @@
 						<a class="{{ if eq .path "/" }}selected{{ end }}" href="#/">All</a>
 					</li>
 					<li>
-						<a class="{{ if eq .path "/active" }}selected{{ end }}" href="/active">Active</a>
+						<a
+							data-hx-get="/active"
+							data-hx-target="section.main"
+							data-hx-select="section.main"
+							class="{{ if eq .path "/active" }}selected{{ end }}" href="/active">Active</a>
 					</li>
 					<li>
 						<a class="{{ if eq .path "/completed" }}selected{{ end }}" href="#/completed">Completed</a>
