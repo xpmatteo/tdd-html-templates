@@ -5,6 +5,7 @@ import (
 	"github.com/playwright-community/playwright-go"
 	"github.com/stretchr/testify/assert"
 	"log"
+	"os"
 	"tdd-html-templates/todo"
 	"testing"
 )
@@ -44,9 +45,11 @@ func Test_clickOnActiveLink(t *testing.T) {
 	// stub network calls
 	err := page.Route("**", func(route playwright.Route) {
 		if route.Request().URL() == "http://localhost:4567/index.html" {
-			returnHtml(route, initialHtml.String())
+			stubResponse(route, initialHtml.String(), "text/html")
 		} else if route.Request().URL() == "http://localhost:4567/active" {
-			returnHtml(route, activeHtml)
+			stubResponse(route, activeHtml, "text/html")
+		} else if route.Request().URL() == "https://unpkg.com/htmx.org@1.9.12" {
+			stubResponse(route, readFile("testdata/htmx.min.js"), "application/javascript")
 		} else {
 			// avoid unexpected requests
 			panic("unexpected request: " + route.Request().URL())
@@ -89,9 +92,17 @@ func Test_clickOnActiveLink(t *testing.T) {
 	assert.Equal(t, "todos", h1.Text())
 }
 
-func returnHtml(route playwright.Route, html string) {
-	textHtml := "text/html"
-	err := route.Fulfill(playwright.RouteFulfillOptions{ContentType: &textHtml, Body: html})
+// readFile reads a file from the filesystem
+func readFile(fileName string) string {
+	data, err := os.ReadFile(fileName)
+	if err != nil {
+		panic(err)
+	}
+	return string(data)
+}
+
+func stubResponse(route playwright.Route, text string, contentType string) {
+	err := route.Fulfill(playwright.RouteFulfillOptions{ContentType: &contentType, Body: text})
 	if err != nil {
 		panic(err)
 	}
