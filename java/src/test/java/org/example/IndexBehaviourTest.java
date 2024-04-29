@@ -104,5 +104,18 @@ public class IndexBehaviourTest {
         Elements newListItems = newDocument.select("ul.todo-list li");
         assertThat(newListItems).hasSize(1);
         assertThat(newListItems.getFirst().text()).isEqualTo("One");
+
+        // now we assert that in the new doc only the main section was replaced
+        Elements h1 = newDocument.select("h1");
+        assertThat(h1.text()).isEqualTo("todos");
+    }
+
+    private String readFile(String fileName) {
+        try {
+            return Files.readString(Paths.get(fileName));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
+
