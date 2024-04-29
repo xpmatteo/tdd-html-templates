@@ -83,6 +83,10 @@ func Test_clickOnActiveLink(t *testing.T) {
 	elements := document.Find("ul.todo-list li")
 	assert.Equal(t, 1, len(elements.Nodes), "unexpected # of matches")
 	assert.Equal(t, "One", text(elements.Nodes[0]))
+
+	// now we assert that in the new doc only the main section was replaced
+	h1 := document.Find("h1")
+	assert.Equal(t, "todos", h1.Text())
 }
 
 func returnHtml(route playwright.Route, html string) {
