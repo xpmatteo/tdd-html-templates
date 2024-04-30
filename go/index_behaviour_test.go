@@ -1,55 +1,29 @@
 package web
 
 import (
-	"bytes"
 	"github.com/playwright-community/playwright-go"
-	"github.com/stretchr/testify/assert"
 	"log"
-	"os"
 	"tdd-html-templates/todo"
 	"testing"
 )
 
-var activeHtml = `
-<!doctype html>
-<html>
-   <body>
-	   <h1>Should not be rendered</h1>
-	   <section class="todoapp">
-		   <section class="main">
-			   <ul class="todo-list">
-				   <li>
-					   <div class="view">
-						   <input class="toggle" type="checkbox">
-						   <label>One</label>
-						   <button class="destroy"></button>
-					   </div>
-				   </li>
-			   </ul>
-		   </section>
-	   </section>
-	</body>
-</html>`
-
+// <codeFragment name = "initial-stage">
 func Test_clickOnActiveLink(t *testing.T) {
+	// render the initial HTML
 	model := todo.NewList().
 		Add("One").
 		AddCompleted("Two")
 	initialHtml := renderTemplate("index.tmpl", model, "/")
 
+	// open the browser page with Playwright
 	page := openPage()
 	defer page.Close()
-
 	logActivity(page)
 
 	// stub network calls
 	err := page.Route("**", func(route playwright.Route) {
 		if route.Request().URL() == "http://localhost:4567/index.html" {
 			stubResponse(route, initialHtml.String(), "text/html")
-		} else if route.Request().URL() == "http://localhost:4567/active" {
-			stubResponse(route, activeHtml, "text/html")
-		} else if route.Request().URL() == "https://unpkg.com/htmx.org@1.9.12" {
-			stubResponse(route, readFile("testdata/htmx.min.js"), "application/javascript")
 		} else {
 			// avoid unexpected requests
 			panic("unexpected request: " + route.Request().URL())
@@ -59,46 +33,14 @@ func Test_clickOnActiveLink(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// load initial html
-	timeout := float64(1000)
-	response, err := page.Goto("http://localhost:4567/index.html", playwright.PageGotoOptions{
-		Timeout: &timeout,
-	})
+	// load initial HTML in the page
+	response, err := page.Goto("http://localhost:4567/index.html")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if response.Status() != 200 {
 		t.Fatalf("unexpected status: %d", response.Status())
 	}
-
-	// click on "Active"
-	active := page.GetByText("Active")
-	if err := active.Click(); err != nil {
-		t.Fatal(err)
-	}
-
-	// now we assert that in the new doc we only have one item
-	content, err := page.Content()
-	if err != nil {
-		t.Fatal(err)
-	}
-	document := parseHtml(t, *bytes.NewBuffer([]byte(content)))
-	elements := document.Find("ul.todo-list li")
-	assert.Equal(t, 1, len(elements.Nodes), "unexpected # of matches")
-	assert.Equal(t, "One", text(elements.Nodes[0]))
-
-	// now we assert that in the new doc only the main section was replaced
-	h1 := document.Find("h1")
-	assert.Equal(t, "todos", h1.Text())
-}
-
-// readFile reads a file from the filesystem
-func readFile(fileName string) string {
-	data, err := os.ReadFile(fileName)
-	if err != nil {
-		panic(err)
-	}
-	return string(data)
 }
 
 func stubResponse(route playwright.Route, text string, contentType string) {
@@ -138,3 +80,14 @@ func openPage() playwright.Page {
 	}
 	return page
 }
+
+// </codeFragment>
+
+/* <codeFragment name = "initial-stage-output">
+=== RUN   Test_clickOnActiveLink
+2024/04/30 11:37:38 >> GET http://localhost:4567/index.html
+2024/04/30 11:37:38 << 200 http://localhost:4567/index.html
+2024/04/30 11:37:38 Loaded: http://localhost:4567/index.html
+--- PASS: Test_clickOnActiveLink (0.89s)
+PASS
+</codeFragment> */
