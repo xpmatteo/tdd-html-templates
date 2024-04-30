@@ -1,13 +1,36 @@
 package web
 
 import (
+	"bytes"
 	"github.com/playwright-community/playwright-go"
+	"github.com/stretchr/testify/assert"
 	"log"
 	"tdd-html-templates/todo"
 	"testing"
 )
 
-// <codeFragment name = "initial-stage">
+// <codeFragment name = "stage-1">
+var activeHtml = `
+<!doctype html>
+<html>
+   <body>
+	   <h1>Should not be rendered</h1>
+	   <section class="todoapp">
+		   <section class="main">
+			   <ul class="todo-list">
+				   <li>
+					   <div class="view">
+						   <input class="toggle" type="checkbox">
+						   <label>One</label>
+						   <button class="destroy"></button>
+					   </div>
+				   </li>
+			   </ul>
+		   </section>
+	   </section>
+	</body>
+</html>`
+
 func Test_clickOnActiveLink(t *testing.T) {
 	// render the initial HTML
 	model := todo.NewList().
@@ -24,6 +47,8 @@ func Test_clickOnActiveLink(t *testing.T) {
 	err := page.Route("**", func(route playwright.Route) {
 		if route.Request().URL() == "http://localhost:4567/index.html" {
 			stubResponse(route, initialHtml.String(), "text/html")
+		} else if route.Request().URL() == "http://localhost:4567/active" {
+			stubResponse(route, activeHtml, "text/html")
 		} else {
 			// avoid unexpected requests
 			panic("unexpected request: " + route.Request().URL())
@@ -41,6 +66,26 @@ func Test_clickOnActiveLink(t *testing.T) {
 	if response.Status() != 200 {
 		t.Fatalf("unexpected status: %d", response.Status())
 	}
+
+	// click on "Active"
+	active := page.GetByText("Active")
+	if err := active.Click(); err != nil {
+		t.Fatal(err)
+	}
+
+	// now we assert that in the new doc we only have one item
+	document := parseHtml(t, content(t, page))
+	elements := document.Find("ul.todo-list li")
+	assert.Equal(t, 1, len(elements.Nodes), "unexpected # of matches")
+	assert.Equal(t, "One", text(elements.Nodes[0]))
+}
+
+func content(t *testing.T, page playwright.Page) bytes.Buffer {
+	content, err := page.Content()
+	if err != nil {
+		t.Fatal(err)
+	}
+	return *bytes.NewBuffer([]byte(content))
 }
 
 func stubResponse(route playwright.Route, text string, contentType string) {
@@ -83,11 +128,28 @@ func openPage() playwright.Page {
 
 // </codeFragment>
 
-/* <codeFragment name = "initial-stage-output">
+/* <codeFragment name = "stage-1-fails">
 === RUN   Test_clickOnActiveLink
-2024/04/30 11:37:38 >> GET http://localhost:4567/index.html
-2024/04/30 11:37:38 << 200 http://localhost:4567/index.html
-2024/04/30 11:37:38 Loaded: http://localhost:4567/index.html
---- PASS: Test_clickOnActiveLink (0.89s)
-PASS
+2024/04/30 12:08:17 >> GET http://localhost:4567/index.html
+2024/04/30 12:08:17 << 200 http://localhost:4567/index.html
+2024/04/30 12:08:17 Loaded: http://localhost:4567/index.html
+    index_behaviour_test.go:83:
+        	Error Trace:	/Users/matteo/work/tdd-templates/go/index_behaviour_test.go:83
+        	Error:      	Not equal:
+        	            	expected: 1
+        	            	actual  : 2
+        	Test:       	Test_clickOnActiveLink
+        	Messages:   	unexpected # of matches
+--- FAIL: Test_clickOnActiveLink (1.96s)
+</codeFragment> */
+
+/* <codeFragment name = "stage-1-passes">
+=== RUN   Test_clickOnActiveLink
+2024/04/30 12:14:17 >> GET http://localhost:4567/index.html
+2024/04/30 12:14:17 << 200 http://localhost:4567/index.html
+2024/04/30 12:14:17 Loaded: http://localhost:4567/index.html
+2024/04/30 12:14:17 >> GET http://localhost:4567/active
+2024/04/30 12:14:17 << 200 http://localhost:4567/active
+2024/04/30 12:14:17 Loaded: http://localhost:4567/active
+--- PASS: Test_clickOnActiveLink (2.35s)
 </codeFragment> */
