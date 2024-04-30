@@ -5,11 +5,11 @@ import (
 	"github.com/playwright-community/playwright-go"
 	"github.com/stretchr/testify/assert"
 	"log"
+	"os"
 	"tdd-html-templates/todo"
 	"testing"
 )
 
-// <codeFragment name = "stage-1">
 var activeHtml = `
 <!doctype html>
 <html>
@@ -49,6 +49,8 @@ func Test_clickOnActiveLink(t *testing.T) {
 			stubResponse(route, initialHtml.String(), "text/html")
 		} else if route.Request().URL() == "http://localhost:4567/active" {
 			stubResponse(route, activeHtml, "text/html")
+		} else if route.Request().URL() == "https://unpkg.com/htmx.org@1.9.12" {
+			stubResponse(route, readFile("testdata/htmx.min.js"), "application/javascript")
 		} else {
 			// avoid unexpected requests
 			panic("unexpected request: " + route.Request().URL())
@@ -78,6 +80,19 @@ func Test_clickOnActiveLink(t *testing.T) {
 	elements := document.Find("ul.todo-list li")
 	assert.Equal(t, 1, len(elements.Nodes), "unexpected # of matches")
 	assert.Equal(t, "One", text(elements.Nodes[0]))
+
+	// now we assert that in the new doc only the main section was replaced
+	h1 := document.Find("h1")
+	assert.Equal(t, "todos", h1.Text())
+}
+
+// readFile reads a file from the filesystem
+func readFile(fileName string) string {
+	data, err := os.ReadFile(fileName)
+	if err != nil {
+		panic(err)
+	}
+	return string(data)
 }
 
 func content(t *testing.T, page playwright.Page) bytes.Buffer {
@@ -125,31 +140,3 @@ func openPage() playwright.Page {
 	}
 	return page
 }
-
-// </codeFragment>
-
-/* <codeFragment name = "stage-1-fails">
-=== RUN   Test_clickOnActiveLink
-2024/04/30 12:08:17 >> GET http://localhost:4567/index.html
-2024/04/30 12:08:17 << 200 http://localhost:4567/index.html
-2024/04/30 12:08:17 Loaded: http://localhost:4567/index.html
-    index_behaviour_test.go:83:
-        	Error Trace:	/Users/matteo/work/tdd-templates/go/index_behaviour_test.go:83
-        	Error:      	Not equal:
-        	            	expected: 1
-        	            	actual  : 2
-        	Test:       	Test_clickOnActiveLink
-        	Messages:   	unexpected # of matches
---- FAIL: Test_clickOnActiveLink (1.96s)
-</codeFragment> */
-
-/* <codeFragment name = "stage-1-passes">
-=== RUN   Test_clickOnActiveLink
-2024/04/30 12:14:17 >> GET http://localhost:4567/index.html
-2024/04/30 12:14:17 << 200 http://localhost:4567/index.html
-2024/04/30 12:14:17 Loaded: http://localhost:4567/index.html
-2024/04/30 12:14:17 >> GET http://localhost:4567/active
-2024/04/30 12:14:17 << 200 http://localhost:4567/active
-2024/04/30 12:14:17 Loaded: http://localhost:4567/active
---- PASS: Test_clickOnActiveLink (2.35s)
-</codeFragment> */
