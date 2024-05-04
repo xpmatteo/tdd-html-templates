@@ -1,6 +1,9 @@
 package todo
 
+import "math/rand"
+
 type Item struct {
+	Id          int
 	Title       string
 	IsCompleted bool
 }
@@ -14,17 +17,42 @@ func NewList() *List {
 }
 
 func (l *List) Add(title string) *List {
-	l.Items = append(l.Items, &Item{Title: title})
+	item := Item{
+		Id:    generateRandomId(),
+		Title: title,
+	}
+	l.Items = append(l.Items, &item)
 	return l
 }
 
 func (l *List) AddCompleted(title string) *List {
 	item := Item{
+		Id:          generateRandomId(),
 		Title:       title,
 		IsCompleted: true,
 	}
 	l.Items = append(l.Items, &item)
 	return l
+}
+
+func (l *List) AddWithId(id int, title string) *List {
+	item := Item{
+		Id:    id,
+		Title: title,
+	}
+	l.Items = append(l.Items, &item)
+	return l
+}
+
+func generateRandomId() int {
+	return abs(rand.Int())
+}
+
+func abs(n int) int {
+	if n < 0 {
+		return -n
+	}
+	return n
 }
 
 func (l *List) AllItems() []*Item {
