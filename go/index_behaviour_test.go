@@ -1,8 +1,11 @@
 package web
 
 import (
+	"bytes"
 	"github.com/playwright-community/playwright-go"
+	"github.com/stretchr/testify/assert"
 	"log"
+	"os"
 	"tdd-html-templates/todo"
 	"testing"
 )
@@ -33,6 +36,9 @@ func Test_toggleTodoItem(t *testing.T) {
 		} else if route.Request().URL() == "http://localhost:4567/toggle/101" && route.Request().Method() == "POST" {
 			// we expect that a POST /toggle/101 request is made when we click on the "One" checkbox
 			stubResponse(route, stubbedHtml, "text/html")
+		} else if route.Request().URL() == "https://unpkg.com/htmx.org@1.9.12" {
+			// serve the htmx library
+			stubResponse(route, readFile("testdata/htmx.min.js"), "application/javascript")
 		} else {
 			// avoid unexpected requests
 			panic("unexpected request: " + route.Request().URL())
@@ -56,6 +62,35 @@ func Test_toggleTodoItem(t *testing.T) {
 	if err := checkbox.Click(); err != nil {
 		t.Fatal(err)
 	}
+
+	// check that the page has been updated
+	document := parseHtml(t, content(t, page))
+	elements := document.Find("body > section.todoapp > p")
+	assert.Equal(t, "Stubbed html", elements.Text(), must(page.Content()))
+}
+
+// readFile reads a file from the filesystem
+func readFile(fileName string) string {
+	data, err := os.ReadFile(fileName)
+	if err != nil {
+		panic(err)
+	}
+	return string(data)
+}
+
+func must(s string, err error) string {
+	if err != nil {
+		panic(err)
+	}
+	return s
+}
+
+func content(t *testing.T, page playwright.Page) bytes.Buffer {
+	content, err := page.Content()
+	if err != nil {
+		t.Fatal(err)
+	}
+	return *bytes.NewBuffer([]byte(content))
 }
 
 func stubResponse(route playwright.Route, text string, contentType string) {

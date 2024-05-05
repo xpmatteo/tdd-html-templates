@@ -4,6 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Template • TodoMVC</title>
+		<script src="https://unpkg.com/htmx.org@1.9.12"></script>
 	</head>
 	<body>
 		<section class="todoapp">
@@ -19,7 +20,12 @@
 					{{ range .model.AllItems }}
 					<li class="{{ if .IsCompleted }}completed{{ end }}">
 						<div class="view">
-							<input id="checkbox-{{.Id}}" class="toggle" type="checkbox">
+							<input
+									data-hx-post="/toggle/{{.Id}}"
+									data-hx-target="section.todoapp"
+									id="checkbox-{{.Id}}"
+									class="toggle"
+									type="checkbox">
 							<label for="checkbox-{{.Id}}">{{.Title}}</label>
 							<button class="destroy"></button>
 						</div>
