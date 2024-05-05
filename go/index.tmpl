@@ -19,8 +19,8 @@
 					{{ range .model.AllItems }}
 					<li class="{{ if .IsCompleted }}completed{{ end }}">
 						<div class="view">
-							<input class="toggle" type="checkbox">
-							<label>{{.Title}}</label>
+							<input id="checkbox-{{.Id}}" class="toggle" type="checkbox">
+							<label for="checkbox-{{.Id}}">{{.Title}}</label>
 							<button class="destroy"></button>
 						</div>
 					</li>

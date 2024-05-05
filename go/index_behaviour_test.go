@@ -7,6 +7,12 @@ import (
 	"testing"
 )
 
+const stubbedHtml = `
+<section class="todoapp">
+	<p>Stubbed html</p>
+</section>
+`
+
 func Test_toggleTodoItem(t *testing.T) {
 	// render the initial HTML
 	model := todo.NewList().
@@ -24,6 +30,9 @@ func Test_toggleTodoItem(t *testing.T) {
 		if route.Request().URL() == "http://localhost:4567/index.html" {
 			// serve the initial HTML
 			stubResponse(route, initialHtml.String(), "text/html")
+		} else if route.Request().URL() == "http://localhost:4567/toggle/101" && route.Request().Method() == "POST" {
+			// we expect that a POST /toggle/101 request is made when we click on the "One" checkbox
+			stubResponse(route, stubbedHtml, "text/html")
 		} else {
 			// avoid unexpected requests
 			panic("unexpected request: " + route.Request().URL())
