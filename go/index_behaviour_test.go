@@ -41,6 +41,12 @@ func Test_toggleTodoItem(t *testing.T) {
 	if response.Status() != 200 {
 		t.Fatalf("unexpected status: %d", response.Status())
 	}
+
+	// click on the "One" checkbox
+	checkbox := page.GetByRole(*playwright.AriaRoleCheckbox, playwright.PageGetByRoleOptions{Name: "One"})
+	if err := checkbox.Click(); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func stubResponse(route playwright.Route, text string, contentType string) {
