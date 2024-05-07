@@ -125,7 +125,7 @@ class IndexTemplateTest {
     }
 
     // thanks https://stackoverflow.com/a/64465867/164802
-    private static Document parseHtml(String html) {
+    public static Document parseHtml(String html) {
         var parser = Parser.htmlParser().setTrackErrors(10);
         var document = Jsoup.parse(html, "", parser);
         assertThat(parser.getErrors()).isEmpty();
