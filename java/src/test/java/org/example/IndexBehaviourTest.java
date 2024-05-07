@@ -60,14 +60,3 @@ public class IndexBehaviourTest {
         }
     }
 }
-
-/*
->> GET http://localhost:4567/index.html
-<< 200 http://localhost:4567/index.html
-Loaded: http://localhost:4567/index.html
-
-com.microsoft.playwright.TimeoutError: Error {
-  message='Timeout 30000ms exceeded.
-  name='TimeoutError
-  stack='TimeoutError: Timeout 30000ms exceeded.
- */
