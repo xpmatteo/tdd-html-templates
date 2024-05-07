@@ -1,6 +1,7 @@
 package org.example;
 
 import com.microsoft.playwright.*;
+import com.microsoft.playwright.options.AriaRole;
 import org.junit.jupiter.api.*;
 
 import static org.example.IndexTemplateTest.renderTemplate;
@@ -54,7 +55,19 @@ public class IndexBehaviourTest {
 
             // load initial html
             page.navigate("http://localhost:4567/index.html");
+
+            page.getByRole(AriaRole.CHECKBOX, new Page.GetByRoleOptions().setName("One")).click();
         }
     }
 }
 
+/*
+>> GET http://localhost:4567/index.html
+<< 200 http://localhost:4567/index.html
+Loaded: http://localhost:4567/index.html
+
+com.microsoft.playwright.TimeoutError: Error {
+  message='Timeout 30000ms exceeded.
+  name='TimeoutError
+  stack='TimeoutError: Timeout 30000ms exceeded.
+ */
