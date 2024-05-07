@@ -11,6 +11,11 @@ public class TodoList {
         return this;
     }
 
+    public TodoList add(int id, String title) {
+        items.add(new TodoItem(id, title, false));
+        return this;
+    }
+
     public TodoList addCompleted(String title) {
         items.add(TodoItem.completed(title));
         return this;

@@ -1,16 +1,22 @@
 package org.example;
 
-public record TodoItem(String title, boolean isCompleted) {
+import java.util.Random;
+
+public record TodoItem(int id, String title, boolean isCompleted) {
 
     public static TodoItem active(String title) {
-        return new TodoItem(title, false);
+        return new TodoItem(generateRandomId(), title, false);
     }
 
     public static TodoItem completed(String title) {
-        return new TodoItem(title, true);
+        return new TodoItem(generateRandomId(), title, true);
     }
 
     public boolean isActive() {
         return !isCompleted;
+    }
+
+    private static int generateRandomId() {
+        return new Random().nextInt(0, Integer.MAX_VALUE);
     }
 }
