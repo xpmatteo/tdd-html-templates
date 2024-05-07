@@ -133,10 +133,10 @@ class IndexTemplateTest {
     }
 
     @SuppressWarnings({"DataFlowIssue", "SameParameterValue"})
-    private String renderTemplate(String templateName, TodoList model, String path) {
+    public static String renderTemplate(String templateName, TodoList model, String path) {
         var template = Mustache.compiler().compile(
                 new InputStreamReader(
-                        getClass().getResourceAsStream(templateName)));
+                        IndexTemplateTest.class.getResourceAsStream(templateName)));
         var data = Map.of(
                 "model", model,
                 "pathRoot", path.equals("/"),
