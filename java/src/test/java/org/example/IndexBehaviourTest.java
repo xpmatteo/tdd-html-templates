@@ -37,12 +37,6 @@ public class IndexBehaviourTest {
         page.onConsoleMessage(consoleMessage -> System.out.println("!  " + consoleMessage.text()));
     }
 
-    String stubbedHtml = """
-            <section class="todoapp">
-                <p>Stubbed html</p>
-            </section>
-            """;
-
     @Test
     void toggleTodoItem() {
         // Render our initial html
@@ -63,6 +57,11 @@ public class IndexBehaviourTest {
                             .setBody(initialHtml));
                 } else if (route.request().url().equals("http://localhost:4567/toggle/101") && route.request().method().equals("POST")) {
                     // we expect that a POST /toggle/101 request is made when we click on the "One" checkbox
+                    String stubbedHtml = """
+                        <section class="todoapp">
+                            <p>Stubbed html</p>
+                        </section>
+                        """;
                     route.fulfill(new Route.FulfillOptions()
                             .setContentType("text/html")
                             .setBody(stubbedHtml));
