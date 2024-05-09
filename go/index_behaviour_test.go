@@ -10,12 +10,6 @@ import (
 	"testing"
 )
 
-const stubbedHtml = `
-<section class="todoapp">
-	<p>Stubbed html</p>
-</section>
-`
-
 func Test_toggleTodoItem(t *testing.T) {
 	// render the initial HTML
 	model := todo.NewList().
@@ -35,6 +29,10 @@ func Test_toggleTodoItem(t *testing.T) {
 			stubResponse(route, initialHtml.String(), "text/html")
 		} else if route.Request().URL() == "http://localhost:4567/toggle/101" && route.Request().Method() == "POST" {
 			// we expect that a POST /toggle/101 request is made when we click on the "One" checkbox
+			const stubbedHtml = `
+				<section class="todoapp">
+					<p>Stubbed html</p>
+				</section>`
 			stubResponse(route, stubbedHtml, "text/html")
 		} else if route.Request().URL() == "https://unpkg.com/htmx.org@1.9.12" {
 			// serve the htmx library
