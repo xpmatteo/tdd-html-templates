@@ -4,6 +4,7 @@ import com.samskivert.mustache.Mustache;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.parser.Parser;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -13,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.example.HtmUtil.normalizeWhitespace;
+import static org.example.HtmUtil.visualizeHtml;
 
 class IndexTemplateTest {
     record TestCase(String name,
@@ -52,7 +55,7 @@ class IndexTemplateTest {
                 return this;
             }
 
-            public Builder matches(String ... matches) {
+            public Builder matches(String... matches) {
                 this.matches = Arrays.asList(matches);
                 return this;
             }
@@ -122,6 +125,22 @@ class IndexTemplateTest {
         for (int i = 0; i < test.matches.size(); i++) {
             assertThat(selection.get(i).text()).isEqualTo(test.matches.get(i));
         }
+    }
+
+    @Test
+    void visualize_html_example() {
+        var model = new TodoList()
+                .add("One")
+                .add("Two")
+                .addCompleted("Three");
+
+        var html = renderTemplate("/todo-list.tmpl", model, "/");
+
+        assertThat(visualizeHtml(html)).isEqualTo(normalizeWhitespace("""
+                ☐ One 🗑️
+                ☐ Two 🗑️
+                ☑ Three 🗑️
+                """));
     }
 
     // thanks https://stackoverflow.com/a/64465867/164802
