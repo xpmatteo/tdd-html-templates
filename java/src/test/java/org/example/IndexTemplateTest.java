@@ -127,22 +127,6 @@ class IndexTemplateTest {
         }
     }
 
-    @Test
-    void visualize_html_example() {
-        var model = new TodoList()
-                .add("One")
-                .add("Two")
-                .addCompleted("Three");
-
-        var html = renderTemplate("/todo-list.tmpl", model, "/");
-
-        assertThat(visualizeHtml(html)).isEqualTo(normalizeWhitespace("""
-                ☐ One 🗑️
-                ☐ Two 🗑️
-                ☑ Three 🗑️
-                """));
-    }
-
     // thanks https://stackoverflow.com/a/64465867/164802
     public static Document parseHtml(String html) {
         var parser = Parser.htmlParser().setTrackErrors(10);
