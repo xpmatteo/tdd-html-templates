@@ -1,3 +1,7 @@
+<!--
+        This template is used to demonstrate Esko Luontola's technique of
+        asserting against a visual representation of the HTML content
+ -->
 <ul class="todo-list">
         {{ #model.allItems }}
         <li class="{{ #isCompleted }}completed{{ /isCompleted }}">
@@ -9,9 +13,9 @@
                                 id="checkbox-{{ id }}"
                                 class="toggle"
                                 type="checkbox"
-                                data-test-icon="{{ #isCompleted }}☑{{ /isCompleted }}{{ ^isCompleted }}☐{{ /isCompleted }}">
+                                data-test-icon="{{ #isCompleted }}✅{{ /isCompleted }}{{ ^isCompleted }}⬜{{ /isCompleted }}">
                         <label for="checkbox-{{ id }}">{{ title }}</label>
-                        <button class="destroy" data-test-icon="🗑️"></button>
+                        <button class="destroy" data-test-icon="❌️"></button>
                 </div>
         </li>
         {{ /model.allItems }}

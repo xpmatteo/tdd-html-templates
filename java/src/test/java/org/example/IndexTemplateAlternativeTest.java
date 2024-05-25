@@ -7,6 +7,12 @@ import static org.example.HtmUtil.normalizeWhitespace;
 import static org.example.HtmUtil.visualizeHtml;
 import static org.example.IndexTemplateTest.renderTemplate;
 
+/*
+    This test demonstrates Esko Luontola's technique of
+    asserting against a visual representation of the HTML content.
+
+    See https://x.com/EskoLuontola/status/1793950013816713691
+ */
 class IndexTemplateAlternativeTest {
     @Test
     void visualize_html_example() {
@@ -18,9 +24,9 @@ class IndexTemplateAlternativeTest {
         var html = renderTemplate("/todo-list.tmpl", model, "/");
 
         assertThat(visualizeHtml(html)).isEqualTo(normalizeWhitespace("""
-                ☐ One 🗑️
-                ☐ Two 🗑️
-                ☑ Three 🗑️
+                ⬜ One ❌️
+                ⬜ Two ❌️
+                ✅ Three ❌️
                 """));
     }
 }
