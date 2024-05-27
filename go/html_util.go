@@ -5,10 +5,6 @@ import (
 	"strings"
 )
 
-func normalizeWhitespace(s string) string {
-	return strings.TrimSpace(replaceAll(s, "\\s+", " "))
-}
-
 func visualizeHtml(html string) string {
 	//  custom visualization using data-test-icon attribute
 	html = replaceAll(html, "<[^<>]+\\bdata-test-icon=\"(.*?)\".*?>", " $1 ")
@@ -17,13 +13,17 @@ func visualizeHtml(html string) string {
 	// strip all HTML tags: block elements
 	html = replaceAll(html, "<[^>]*>", " ")
 	// replace HTML character entities
-	html = replaceAll(html, "&nbsp;", " ")
+	html = replaceAll(html, "&nbsp;", " ") // must be after stripping HTML tags, to avoid creating accidental elements
 	html = replaceAll(html, "&lt;", "<")
 	html = replaceAll(html, "&gt;", ">")
-	html = replaceAll(html, "&amp;", "&")
 	html = replaceAll(html, "&quot;", "\"")
 	html = replaceAll(html, "&apos;", "'")
+	html = replaceAll(html, "&amp;", "&") // must be last, to avoid creating accidental character entities
 	return normalizeWhitespace(html)
+}
+
+func normalizeWhitespace(s string) string {
+	return strings.TrimSpace(replaceAll(s, "\\s+", " "))
 }
 
 func replaceAll(src, regex, repl string) string {

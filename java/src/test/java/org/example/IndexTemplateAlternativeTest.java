@@ -23,10 +23,11 @@ class IndexTemplateAlternativeTest {
 
         var html = renderTemplate("/todo-list.tmpl", model, "/");
 
-        assertThat(visualizeHtml(html)).isEqualTo(normalizeWhitespace("""
-                ⬜ One ❌️
-                ⬜ Two ❌️
-                ✅ Three ❌️
-                """));
+        assertThat(visualizeHtml(html))
+                .isEqualTo(normalizeWhitespace("""
+                        ⬜ One ❌️
+                        ⬜ Two ❌️
+                        ✅ Three ❌️
+                        """));
     }
 }
